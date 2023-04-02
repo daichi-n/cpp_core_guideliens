@@ -1,1 +1,177 @@
-xxx
+I.7: State postconditions
+(事後条件を明示する)
+
+関数の処理の期待値を明確にする。リソース開放などに関しては可能な限り実装上で表現する。
+
+I.8: Prefer Ensures() for expressing postconditions
+(事後条件を明示するのにEnsures()を使う)
+
+関数の処理の期待値をEnsures()で明示する。ただし、本案件ではほぼ使用ししていない。リソース開放などに関しては可能な限り実装上で表現する。
+
+I.9: If an interface is a template, document its parameters using concepts
+(インターフェースがテンプレートの場合、引数にコンセプトで注釈をつける)
+
+C++20から導入される「コンセプト (concepts)」で、テンプレートパラメータを制約する。
+
+I.10: Use exceptions to signal a failure to perform a required task
+(必要な措置を講じるために失敗の通知には例外を使う)
+
+エラーとは関数が呼びもとに期待された動作を実現できなかったこと。エラーを起こした場合は例外を投げるべき。例外を使えない場合は値,エラーコードの戻り値を検討する。
+
+I.11: Never transfer ownership by a raw pointer (T*) or reference (T&)
+(決して生ポインタで所有権を渡さない)
+
+生ポインタはリソースリークや使用前のリリースを招き、バグにつながる。
+
+I.12: Declare a pointer that must not be null as not_null
+(nullになってはいけないポインターは、(GSLの)not_nullとして宣言する)
+
+not_nullが定義されていないポインタを使用する際は常にnullの可能性を考慮する。not_nullはおそらく使用しない。
+
+I.13: Do not pass an array as a single pointer
+(配列をポインター1つだけで渡さない)
+
+引数がポインタ+サイズの場合、その関数の中で配列の領域外アクセスをする可能性を防げない。引数をspanやvectorに変えることを検討する。
+
+I.22: Avoid complex initialization of global objects
+(グローバルオブジェクトの複雑な初期化は避ける)
+
+翻訳単位が異なるグローバルオブジェクトの呼び出し順序は不定のため、グローバルオブジェクト同士が相互に参照して初期化すると一方は不定の値で初期化することになる。
+
+I.23: Keep the number of function arguments low
+(できるだけ引数の数は少なくする)
+
+引数が多い関数は抽象化が足りていない。関数の処理パターンがコントロールできなくなりエラーにつながる。また、単一機能単一責任になっておらず、複数の役割を担おうとしており、リファクタの対象と判断できる。パラメータはなるべく4つまでとする。
+
+I.24: Avoid adjacent unrelated parameters of the same type
+(同じ型の無関係な引数が隣接しないようにする)
+
+引数の順序が意味をなす場合に、同じ型がならぶとどちらが入力でどちらが出力なのかを読み手に混乱させる。配列のコピー元、コピー先など。
+パラメータを構造体にして各引数の役割を変数名で明確にする。
+
+
+I.25: Prefer abstract classes as interfaces to class hierarchies
+(クラス階層よりもインターフェースとしての抽象クラスを使う)
+
+データを持たないインタフェースクラスを継承したほうが、各継承クラスの実装がシンプルになる。
+
+I.26: If you want a cross-compiler ABI, use a C-style subset
+(コンパイラを跨ぐABIが必要なら、C言語の機能に絞ったサブセットを使う)
+
+コンパイラによって、クラス、例外処理、関数名など、実装の詳細が異なるバイナリレイアウトを実装しているため。
+
+I.27: For stable library ABI, consider the Pimpl idiom
+(安定したライブラリのABIのためにPimplパターンの使用を検討する)
+
+軽微な修正による再コンパイルを避けるためにPimplパターンの使用を検討する。
+
+I.30: Encapsulate rule violations
+(ルール違反をカプセル化する)
+
+設計上どうしても必要なイレギュラーな実装は別のユーザーから参照できない内部の実装にとどめる。インタフェースとして見える箇所には漏れないようにする。
+
+F.1: "Package" meaningful operations as carefully named functions
+(意味のある一連の処理を関数に注意深く命名して、「まとめる」)
+
+コードの可読性と再利用性を高めるために、アクションが一連の流れとして規定されているものは正しい名前をつけてまとめること。
+
+F.2: A function should perform a single logical operation
+(関数は論理的に1つの処理のみをするべきである)
+
+シンプルな関数は読み手が理解しやすく、テスト、再利用もしやすい。
+
+F.3: Keep functions short and simple
+(関数は短くシンプルに保つ)
+
+長い関数は制御も複雑になり、エラーを隠す可能性が高くなる。画面におさまらない関数は、意味のある単位で小さな関数に分割する。
+
+F.4: If a function may have to be evaluated at compile time, declare it constexpr
+(関数がコンパイル時に評価されうるなら、constexprで宣言する)
+
+コンパイル時点でエラーチェックができROM化することができる。
+
+F.5: If a function is very small and time-critical, declare it inline
+(関数が非常に小さく時間的制約が強ければ、inlineで宣言する)
+
+
+インライン関数はABIの一部のため、安定したインターフェイスであることを意図しているものには、今後の変更されないことが確実でない限り、インライン関数を置かない。
+関数テンプレートは通常ヘッダ定義のためインラインになる。
+constexprはinlineを意味する。
+クラス内で定義されたメンバ関数は、デフォルトでインライン化されます。
+★要確認
+
+F.6: If your function may not throw, declare it noexcept
+(関数が例外を投げないなら、noexceptで宣言する)
+
+noexcept関数を宣言すると、代替実行経路の数を減らすことができ、最適化の助けになります。また、失敗後の終了を早めることができます。
+C言語や例外のない他の言語で完全に書かれたすべての関数にnoexceptを付けるべき。
+noexceptは、頻繁に使用される低レベルの関数に最も有効。
+
+F.7: For general use, take T* or T& arguments rather than smart pointers
+(一般的な用途の引数にはスマートポインタより普通のポインタまたは参照を使う)
+
+スマートポインタ（std::shared_ptrなど）を渡すと、ランタイムコストが発生する。
+★要検討
+
+F.8: Prefer pure functions
+(関数はできるだけ純粋関数(副作用のない関数)にする)
+
+純粋関数はシンプルで最適化しやすくROM化もできるため。
+
+F.9: Unused parameters should be unnamed
+(使用しない仮引数に名前を付けてはいけない)
+
+読みやすさの向上と未使用パラメータに対する警告を避けるため。
+パラメータが条件付きで未使用になる場合は、[[maybe_unused]]属性で宣言する。
+
+F.10: If an operation can be reused, give it a name
+(再利用できる操作であれば、名前をつけておく。)
+
+無名ラムダの役割が増えすぎた場合などに、その役割を明確にし、読みやすくする。
+
+F.11: Use an unnamed lambda if you need a simple function object in one place only
+₍シンプルな関数オブジェクトが一か所だけ必要な場合は、無名ラムダを使用します。₎
+
+コードが簡潔になり、代替案よりも優れた局所性を得ることができます。名前付けはたとえ一度しか使用されない場合でも、わかりやすくするために有効です。
+
+F.15: Prefer simple and conventional ways of passing information
+(情報を渡す方法はシンプルかつ一般的なものにする)
+
+一般的なテクニックを超えた最適化が本当に必要だと感じたら、それが本当に改善であることを確認するために測定し、改善が移植できないかもしれないので文書化/コメントする。
+
+F.16: For "in" parameters, pass cheaply-copied types by value and others by reference to const
+(入力用引数は、安価にコピーできる型は値で渡し、それ以外はconst参照で渡す)
+
+高速かつ単純になり、安全性も確保できる。rvalueによる初期化を可能にする。
+？？
+
+F.17: For "in-out" parameters, pass by reference to non-const
+(入出力用引数は非const参照で渡す)
+
+非const参照の場合は更新されることが前提であると理解する。ただし、それ自体がバグを引き起こしかねない実装である。span<T>やイテレータはそれ自体が入出力引数になる。
+
+F.18: For “will-move-from” parameters, pass by X&& and std::move the parameter
+₍will-move-from」パラメータは、X&&とstd::moveでパラメータを渡します。₎
+効率的で、呼び出し先でのバグをなくすことができる。
+？？
+
+F.19: For "forward" parameters, pass by T&& and only std::forward the parameter
+(転送する引数はT&&にして、引数をstd::forwardする)
+オブジェクトが他のコードに渡され、この関数で直接使用されない場合、この関数は引数のconst-nessとrvalue-nessに不可知論的であるようにしたいです。
+？？
+
+F.20: For "out" output values, prefer return values to output parameters
+(値を返すには、出力用引数よりも戻り値を使う)
+
+戻り値は役割が自明だが、&はin-outかout-onlyの2つの意味があり、誤用される可能性がある。ただし、charを複数持つ構造体などmoveの負荷が高いケースは戻り値だと最適化されない。
+
+F.21: To return multiple "out" values, prefer returning a tuple or struct
+(複数の値を返すには、タプルか構造体を使う)
+
+戻り値は役割が自明であるため。戻り値に意味がある場合は構造体、それ以外はタプルを使用する。
+
+F.60: Prefer T* over T& when "no argument" is a valid option
+(「値なし」がありえるなら参照ではなくポインターを使う)
+
+参照は関数内でのnullチェックの手間を省くことが一般的であるから。
+？？
