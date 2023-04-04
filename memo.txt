@@ -240,3 +240,50 @@ C.12: Don’t make data members const or references
 (データメンバーをconstまたは参照にしない)
 
 コピーできないメンバ変数を持つことは方を使いづらくする。₍参照も部分敵にコピー付加となる。₎
+
+Enum: Enumerations / 列挙
+Enum.1: Prefer enumerations over macros
+(マクロより列挙型を使う)
+
+マクロはスコープや型の規則がない。同名を複数個所で定義できるため、意図しないマクロが使用されてしまう可能性がある。
+また、マクロは前処理中に削除されるため、デバッガーなどのツールでは表示されない。デバッグしづらい。
+
+Enum.2: Use enumerations to represent sets of related named constants
+(名前の付いた定数のセットを表すのに列挙型を使う)
+
+関連する定数のセットを、名前付きの型にすることができます。
+列挙型にすることで大文字と小文字の違いなど異常なパターンに対してコンパイラがチェックできる。
+switch構文で抜け漏れを防ぐこともできる。
+
+Enum.3: Prefer enum classes over "plain" enums
+(素のenumよりenum classを使う)
+
+意図しない挙動を最小限にする。従来のenumはintに型変換されて、ほかのラベルを期待する場合でもそれなりにふるまってしまう。
+enum classを使えば期待するenumのみを使用しているのかをコンパイラがチェックできる。
+
+Enum.4: Define operations on enumerations for safe and simple use
+(列挙型に演算子を定義して安全かつシンプルに使えるようにする)
+
+使いやすさとエラーの回避。面倒な処理のカプセル化と個別の実装でミスをすることによるエラーを回避する。
+
+Enum.5: Don’t use ALL_CAPS for enumerators
+(列挙型の名前を全て大文字の名前にしない)
+
+マクロとの衝突を避けるため。
+
+Enum.6: Avoid unnamed enumerations
+(無名の列挙型を避ける)
+
+列挙型に名前を付けることができない場合、それは値の設計ができていないことをさす。
+関連がないのなら個別にconstexpr で宣言すること。
+
+Enum.7: Specify the underlying type of an enumeration only when necessary
+(列挙型の基本型は必要な場合のみ与える)
+
+フォルトは、読み書きが最も簡単です。 デフォルトはintで、C 列挙型と互換性があります。
+またメモリの節約にもなる。
+
+Enum.8: Specify enumerator values only when necessary
+(列挙子の値は必要な場合のみ与える)
+
+列挙値の重複や抜けを回避し、switchの実装に適した連続した値のセットが提供されるため。
