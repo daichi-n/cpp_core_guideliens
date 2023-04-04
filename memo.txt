@@ -174,4 +174,69 @@ F.60: Prefer T* over T& when "no argument" is a valid option
 (「値なし」がありえるなら参照ではなくポインターを使う)
 
 参照は関数内でのnullチェックの手間を省くことが一般的であるから。
-？？
+？？.
+
+C: Classes and class hierarchies / クラスとクラス階層
+C.1: Organize related data into structures (structs or classes)
+(関連するデータをクラスまたは構造体で組織化する)
+
+可読性の向上のために、データの関連をコード上で表現すること。
+仮想関数のない単純なクラスは、スペースや時間のオーバーヘッドがないため、classで表現することにデメリットは少ない。
+class(private)とstruct(public)の違いは、メンバーのデフォルトの可視性だけ。
+
+C.2: Use class if the class has an invariant; use struct if the data members can vary independently
+(クラスが不変条件を持つならclassを、メンバーが独立に変更できるならstructを使う)
+
+クラスを使用すると、不変条件の必要性がプログラマーに警告されます。？？
+不変条件とは、公開関数によってしか変更できない、コンストラクションで初期化されるprivate変数のこと。
+不変条件があるならクラスを使用する、ないなら構造体で実装する。
+
+C.3: Represent the distinction between an interface and an implementation using a class
+(クラスを使ってインターフェースと実装の区別を表現する)
+
+可読性が向上し、メンテナンスが簡単になる。？？
+
+C.4: Make a function a member only if it needs direct access to the representation of a class
+(クラスの内部表現(※privateメンバー)に直接アクセスする必要がある場合に限り、関数をメンバーにする)
+
+クラスのメンバ変数を使用して処理をする必要がない場合はヘルパー関数をクラス外に実装する。
+
+C.5: Place helper functions in the same namespace as the class they support
+(ヘルパー関数は対象とするクラスと同じ名前空間に置く)
+
+ヘルパー関数はクラスのメンバ変数などに直接アクセスする必要はないが、クラスの有用なインターフェースの一部とみなされる関数です。クラスと同じ名前空間に置くことで、クラスとの関係が明らかになり、引数に依存した検索が可能になります。
+
+C.7: Don’t define a class or enum and declare a variable of its type in the same statement
+(クラスなどの定義とその型の変数の宣言を1文で書かない)
+
+混乱を招くので、型の定義と変数の宣言は同じ行で行わない。
+
+C.8: Use class rather than struct if any member is non-public
+(publicではないメンバーがあるなら構造体ではなくクラスを使う)
+
+外部に対して何かを隠したいという意思表示のためにクラスを使用する。
+デフォルトがpribateのため、publicにするものを限定しているイメージ。
+
+C.9: Minimize exposure of members
+(メンバーの露出を最小限にする)
+
+カプセル化することで、意図しないアクセスを最小化する。これにより、メンテナンスが簡素化される。
+メンバ変数に対しての処理を追いやすくする。
+
+C.concrete: Concrete types / 具象型
+C.10: Prefer concrete types over class hierarchies
+(クラス階層よりも具象クラスを使う)
+
+具体的な型はスタックアロケートされ、他のクラスのメンバとなることができる。
+クラス階層だとポインタや参照を通じてそのオブジェクトを操作する必要があり、メモリ・オーバーヘッドなどランタイム・オーバーヘッドになる。
+
+C.11: Make concrete types regular
+(具象型の振る舞いを一般的なものにする)
+
+代入や等式など一般的なインターフェースを使用可能なクラス設計にする。理解しやすくなるため。
+等価比較演算子も実装して置くのが望ましい。
+
+C.12: Don’t make data members const or references
+(データメンバーをconstまたは参照にしない)
+
+コピーできないメンバ変数を持つことは方を使いづらくする。₍参照も部分敵にコピー付加となる。₎
