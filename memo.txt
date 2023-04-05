@@ -287,3 +287,56 @@ Enum.8: Specify enumerator values only when necessary
 (列挙子の値は必要な場合のみ与える)
 
 列挙値の重複や抜けを回避し、switchの実装に適した連続した値のセットが提供されるため。
+
+Parameter passing semantic rules / 引数の意味論的なルール
+F.22: Use T* or owner<T*> to designate a single object
+(1つのオブジェクトを指すのにT*か(GSLの)owner<T*>を使う)
+
+単純な型のポインターがさす情報は曖昧であるため、コードが何を意味して何をしようとしているのかがあいまいになってしまう。
+配列のサイズやリソース開放の必要性などを判断しづらい。
+
+F.23: Use a not_null<T> to indicate that "null" is not a valid value
+(nullにならないことを示すのに(GSLの)not_null<T>を使う)
+
+ポインタ変数に対してnot_nullでガードをかける。nullptrのチェックを関数の呼び出しもとが行うことを明確にする。
+ただし、Callistoだとnot_nullはあまり使っていない。
+
+F.24: Use a span<T> or a span_p<T> to designate a half-open sequence
+(半開区間を指すには(GSLの)span<T>か(GSLの)span_p<T>を使う)
+
+spanとspan_pは範囲走査を安全におこなうためのヘルパーであり、ポインタと同様に効率的に要素へアクセスできる。
+
+Value return semantic rules / 戻り値の意味論的なルール
+F.42: Return a T* to indicate a position (only)
+(位置を知らせる場合に限りポインターを返す)
+
+T*は所有権を移すためではなく、単一のオブジェクトの位置を示すために使用する。
+
+F.43: Never (directly or indirectly) return a pointer or a reference to a local object
+(ローカルオブジェクトの参照やポインターを決して返さない)
+
+破棄されたオブジェクトを参照するポインタを使用することで、データの破損やソフトのクラッシュが起きるため。
+
+
+F.44: Return a T& when copy is undesirable and "returning no object" isn’t needed
+(コピーが望ましくなく、「値なし」が必要なければ参照を返す)
+
+T&がオブジェクトを指すことは言語が保証しているので、nullptrのチェックを実装しなくて済む。
+
+Other function rules / その他の関数のルール
+F.50: Use a lambda when a function won’t do (to capture local variables, or to write a local function)
+(関数が上手くいかないときはラムダ式を使う(ローカル変数をキャプチャーするか、ローカル関数を書きたい場合))
+
+関数、ラムダ、関数オブジェクトを比較し手使用する。
+関数オブジェクトで実装するよりもラムダを使うほうがシンプルになることが多い。
+
+F.51: Where there is a choice, prefer default arguments over overloading
+(デフォルト引数とオーバーロードを選べるときはデフォルト引数を使う)
+
+インターフェースの種類を増やす際に、コードの複製を回避できるため。オーバーロードした場合はコピーコードが生まれる懸念がある。
+
+F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms
+(標準アルゴリズムへ渡す場合を含めて、ローカルで使われるラムダ式は参照キャプチャーを優先する)
+
+値渡しよりも参照渡しのほうがほとんどの場合でコストが低いため。
+ただし、参照渡しは呼び出しもと周辺の処理に依存するという副作用がある。
