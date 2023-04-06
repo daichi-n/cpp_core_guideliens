@@ -340,3 +340,148 @@ F.52: Prefer capturing by reference in lambdas that will be used locally, includ
 
 値渡しよりも参照渡しのほうがほとんどの場合でコストが低いため。
 ただし、参照渡しは呼び出しもと周辺の処理に依存するという副作用がある。
+
+
+ES: Expressions and statements / 式と文
+ES.1: Prefer the standard library to other libraries and to "handcrafted code"
+(自作や非標準の物より、標準ライブラリを使う)
+ライブラリを使用すると、言語機能を直接操作するコードよりも簡単に短く記述できる。
+また、ライブラリのコードは動作を保障されている。
+ただし、ライブラリの多くは動的メモリ割り当てに依存している。その場合は別途対策が必要。
+
+ES.2: Prefer suitable abstractions to direct use of language features
+(言語機能を直接使うより適切な抽象化を使う)
+
+コンテナなどを使うことにより、コードが短く簡潔になり、適切なテストができるようになる。
+エラーのチェック処理などのコードを実装する量が減る。
+
+ES.3: Don’t repeat yourself, avoid redundant code
+₍繰り返さないでください。冗長なコードは避けてください₎
+
+コピーコードや冗長なコードはロジックの理解を難しくし、メンテナンスがしづらくなる。
+独自の実装を作成する代わりに、必要に応じて標準アルゴリズムを使用すること。
+ifの分岐処理なども重複したコードが内容に設計する。
+
+ES.dcl: Declarations / 宣言
+ES.5: Keep scopes small
+(スコープを小さく保つ)
+
+可読性とリソース使用範囲の制限のため。不必要に大きなスコープで変数を宣言しない。
+
+ES.6: Declare names in for-statement initializers and conditions to limit scope
+(条件部やfor文の初期化部で名前を宣言し、スコープを制限する)
+
+可読性のため。ループの後でループ変数をほかの目的に使用されることを回避する。
+ただし、for文の条件部には実行コストの高い処理は含めない。関数呼び出しなど。
+C++17 and C++20ではif文での初期化ステートメントも実装さている。₍初期化後に初期化した値で判定する構文₎
+
+ES.7: Keep common and local names short, and keep uncommon and nonlocal names longer
+(一般的で局所的な名前は短く、そうでない名前は長くする)
+
+可読性のため。 関連のない名前同士の衝突の可能性を下げる。
+ローカルに収まらないコードでの短い名前は読みやすさを妨げる。
+
+ES.expr: Expressions / 式
+ES.40: Avoid complicated expressions
+(複雑な式を避ける)
+
+以下のような構文は混乱を招く。
+・条件分岐内の代入式
+・条件式内の複数のローカル変数
+・部分式に隠された代入式
+・優先順位規則に依存した₍₎のない構文
+
+ES.41: If in doubt about operator precedence, parenthesize
+(演算子の優先順位が疑わしい場合、カッコを使う)
+
+優先順位規則を常に覚えているわけではないので、カッコをつけて読みやすくすること。
+
+ES.42: Keep use of pointers simple and straightforward
+(ポインターの使用箇所は単純明快にする))
+
+ポインター使用して、インクリメントや添え字で連続領域にアクセスするような実装は避けること。
+配列に対しての反復子が必要な場合はspanを使用する。
+
+ES.stmt: Statements / 文
+ES.70: Prefer a switch-statement to an if-statement when there is a choice
+(選べるならif文よりswitch文を使う)
+
+可読性。switchは定数との比較になり、テストも容易になる。
+また、条件分岐のチェック機能も備えている。₍defaultの考慮、分岐の抜け漏れ₎
+
+ES.71: Prefer a range-for-statement to a for-statement when there is a choice
+(選べるならfor文より範囲for文を使う)
+
+可読性とエラー回避。ループの本体で「ループ変数をいじる」ことは避けるべき。
+その際にループ変数のコピーも内容にする。
+
+ES.72: Prefer a for-statement to a while-statement when there is an obvious loop variable
+(明確なループ変数があるならwhile文よりfor文を使う)
+
+どのようにどこまで繰り返すのが明確になるから。
+
+Arithmetic / 算術
+ES.100: Don’t mix signed and unsigned arithmetic
+(符号ありと符号なしの計算を混在させない)
+
+意図しない値になることを避けるため。
+※C++ は配列の添え字に符号付き整数を使用し、標準ライブラリはコンテナの添え字に符号なし整数を使用する。
+
+ES.101: Use unsigned types for bit manipulation
+(ビット演算には符号なしの型を使う)
+
+符合の有無による意図しない値への変化を避ける。
+
+ES.102: Use signed types for arithmetic
+(算術演算には符号ありの型を使う)
+
+算術演算は符合付きを前提として多くの処理が実装されているため。
+
+Per: Performance / パフォーマンス
+Per.1: Don’t optimize without reason
+(訳もなく最適化しない)
+
+パフォーマンスが期待値を満たす状態での最適化は、エラーの増加とメンテナンス コストの増加をまねく。
+
+Per.2: Don’t optimize prematurely
+(早すぎる最適化をしない)
+
+最適化されたコードは最適化されていないコードよりもサイズが大きく、変更が難しくなる。
+ほかの人が修正しにくいコードになっている。
+
+Per.3: Don’t optimize something that’s not performance critical
+(パフォーマンス上重要でない部分を最適化しない)
+
+最適化の対象を感覚で決めてしまうと、局所的に改善にしかならない。
+ソフトを使用する全体でみると些細な効果しか出ないかもしれない。
+
+Per.4: Don’t assume that complicated code is necessarily faster than simple code
+(複雑なコードがシンプルなコードより早いと思わない)
+
+高速化を目指して複雑にしたことで結果的に遅くなるケースがある。
+シンプルなコードのほうがコンパイル時の最適化の結果として早くなるケースは多々ある。
+
+Per.5: Don’t assume that low-level code is necessarily faster than high-level code
+(低レベルなコードが高レベルなコードより早いと思わない)
+
+低レベルなコードはコンパイラによる最適化を受けにくい。
+高レベルなコードのほうがコンパイラによる最適化が効果を発揮することがある。
+
+Per.6: Don’t make claims about performance without measurements
+(計測せずに意見しない)
+
+
+Per.7: Design to enable optimization
+(最適化できるように設計する)
+
+
+Per.10: Rely on the static type system
+(静的型システムを信頼する)
+
+
+Per.11: Move computation from run time to compile time
+(実行時処理をコンパイル時処理に変える)
+
+
+Per.12: Eliminate redundant aliases
+(冗長なエイリアスを除去する)
