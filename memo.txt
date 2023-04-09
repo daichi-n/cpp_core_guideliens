@@ -470,18 +470,102 @@ Per.5: Don’t assume that low-level code is necessarily faster than high-level 
 Per.6: Don’t make claims about performance without measurements
 (計測せずに意見しない)
 
+一般論や経験則で改善を行うとパフォーマンスの改善を適切に行えない。
+計測し、クリティカル箇所をデータやツールを用いて導き出すこと。
+プロファイラを使えばより効率的にシステムの見えるかをできる。
 
 Per.7: Design to enable optimization
 (最適化できるように設計する)
 
+改善の見通しを立てずに設計した場合は後工程での修正が大変になる。
 
 Per.10: Rely on the static type system
 (静的型システムを信頼する)
 
+単純な型を使用すると最適化がされやすくなる。
 
 Per.11: Move computation from run time to compile time
 (実行時処理をコンパイル時処理に変える)
 
+コードサイズと実行時間を短縮できる。₍コンパイル時にエラー処理をすることで、実行時チェックのコードが減る。₎
 
 Per.12: Eliminate redundant aliases
 (冗長なエイリアスを除去する)
+
+※記載なし。
+
+CP: Concurrency and parallelism / 並行・並列処理
+CP.1: Assume that your code will run as part of a multi-threaded program
+(マルチスレッドプログラムの一部として実行される可能性を考慮する)
+
+コードは再利用されるため、今後の修正でマルチスレッドの中で実行される可能性がある。
+ライブラリコードに対してはこのルールをマストで適用すること。
+
+CP.2: Avoid data races
+(データ競合を避ける)
+
+動作が保証できず解析しにくいエラーが起きる。
+ローカル静的変数などが問題個所となる。
+
+CP.3: Minimize explicit sharing of writable data
+(書き込み可能なデータの明示的な共有を最小限にする)
+
+変更可能なデータの共有範囲は最小限にする。
+
+CP.4: Think in terms of tasks, rather than threads
+(スレッドよりもタスクで考える)
+
+スレッドは実装の概念であり、マシンに関する考え方です。 
+タスクはアプリケーションの概念であり、できれば他のタスクと同時に実行したいものです。 
+アプリケーションの概念は、簡単に推論できます。
+
+CP.8: Don’t try to use volatile for synchronization
+(同期のためにvolatileを使おうとしない)
+
+volatileはメモリー・アクセス処理を分割しないことを保障しない。
+volatileではなくatomic or mutexを使用する。
+
+CP.9: Whenever feasible use tools to validate your concurrent code
+(並行処理のコードを検証するのにツールが使えるときは使う)
+
+基本的なテストでは順次実行されるコードのエラーしか正しく評価できない。
+静的解析ツール(clang)や 動的解析ツール(Thread Sanitizer)を活用する。
+
+CP.con: Concurrency / 並行処理
+CP.20: Use RAII, never plain lock()/unlock()
+(素のlock()/unlock()を避け、RAIIにする)
+
+ロックの解放漏れを防ぐためにデストラクタで解放するクラスを使用する。₍unique_lockなど₎
+
+CP.21: Use std::lock() or std::scoped_lock to acquire multiple mutexes
+(複数のミューテックスを獲得するのにstd::lock()やstd::scoped_lockを使う)
+
+std::adopt_lockやscoped_lockを使用してデッドロックを回避する。
+
+CP.22: Never call unknown code while holding a lock (e.g., a callback)
+(ロックを持っている間、コールバックのような未知のコードを決して呼び出さない)
+
+
+CP.mess: Message passing / メッセージパッシング
+CP.60: Use a future to return a value from a concurrent task
+(並行するタスクから値を返すにはfutureを使う)
+
+
+CP.61: Use an async() to spawn a concurrent task
+(並行タスクをスポーンするにはasync()を使う)
+
+CP.free: Lock-free programming / ロックフリープログラミング
+CP.100: Don’t use lock-free programming unless you absolutely have to
+(本当に必要な場合を除き、ロックフリープログラミングをしない)
+
+
+CP.101: Distrust your hardware/compiler combination
+(自分のハードウェア、コンパイラの組み合わせを信用しない)
+
+
+CP.102: Carefully study the literature
+(文献で入念に勉強する)
+
+CP.etc: Etc. concurrency rules / その他
+CP.200: Use volatile only to talk to non-C++ memory
+(volatileはC++外のメモリーを読み書きするためだけに使う)
