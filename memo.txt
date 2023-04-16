@@ -569,3 +569,203 @@ CP.102: Carefully study the literature
 CP.etc: Etc. concurrency rules / その他
 CP.200: Use volatile only to talk to non-C++ memory
 (volatileはC++外のメモリーを読み書きするためだけに使う)
+
+
+E: Error handling / エラーハンドリング
+E.1: Develop an error-handling strategy early in a design
+(エラーハンドリング戦略を設計の早い段階で作る)
+
+開発の後段で、ある程度組みあがったシステムに、エラーハンドリングを設計して組み込むのはコストが高く、一貫性のないものになる可能性が高い。
+
+E.2: Throw an exception to signal that a function can’t perform its assigned task
+(関数がその目的を果たせないことを知らせるために例外を投げる)
+
+エラーを戻り値ではなく、例外で投げる。処理の呼びもとはtry~catchで異常系の処理を実装する。
+例外とは：
+　前提条件を満たさない。
+　オブジェクトの構築に失敗する
+　範囲外参照をする。
+　リソースが確保できない。
+
+E.3: Use exceptions for error handling only
+(例外はエラーハンドリングのためだけに使う)
+
+エラー処理と正常系のコードを明確に分離するため。また、例外は基本的に起きないことを前提として実装する。
+例外によって値を返すことは通常のretrunよりも基本的に遅くなる。
+
+E.4: Design your error-handling strategy around invariants
+(不変条件に関するエラーハンドリング戦略を設計する)
+
+？？
+
+E.5: Let a constructor establish an invariant, and throw if it cannot
+(コンストラクターで不変条件を確立し、できないときは例外を投げる)
+
+オブジェクトを安定して使用できるように、内部で必要な前提条件はすべてコンストラクタで初期化しておくこと。
+初期化に失敗する場合はコンストラクタで例外を投げること。
+
+E.6: Use RAII to prevent leaks
+(リークを防ぐためにRAIIを使う)
+
+例外送出箇所ごとに手動でリソース解放するなどは冗長でありミスが起こりやすい。
+
+
+E.7: State your preconditions
+(事前条件を明記する)
+
+インターフェイスエラーを回避するためです。₍I.5参照₎
+
+E.8: State your postconditions
+(事後条件を明記する)
+
+インターフェイスエラーを回避するためです。₍I.7参照₎
+
+E.12: Use noexcept when exiting a function because of a throw is impossible or unacceptable
+(例外を投げることが不可能または受け入れられない関数を抜けるためにnoexceptを使う)
+
+noexceptがあることで読み手にわかりやすく、呼ぼ出し元のコードも簡潔になる。
+
+E.13: Never throw while being the direct owner of an object
+(オブジェクトを直接(RAIIラッパー無しで)所有している場合は決して例外を投げない)
+
+make_unique or ローカル変数を使用してリソース解放漏れを回避する。
+
+Con: Constants and immutability / 定数と不変性
+
+Con.1: By default, make objects immutable
+(まずはオブジェクトを不変にする)
+
+オブジェクトが変わらないことを明示することで、オブジェクト使用箇所のコードを読みやすくする。
+また、意図しない値の変更を防ぐ。
+関数の引数を値で渡す箇所にはこのルールは適用しない。
+値で受け取って内部で変える実装はあまりないため。
+※製品コードでは割とつけることが多い。
+
+Con.2: By default, make member functions const
+(まずはメンバ－関数をconstにする)
+
+オブジェクトの状態を変更しない場合はconstを付与する。
+設計の意図が伝わりやすく、設計のブレをコンパイラでエラーを検出しやすくなる。
+ライブラリなどはconstになっていないケースもあるがその際はラッパーなども検討する。
+
+Con.3: By default, pass pointers and references to consts
+(まずはポインターと参照はconstで渡す)
+
+関数内で意図せず値を変えられることを避けるため。
+オブジェクトを変更する場合にのみnon-constで渡すべき
+
+Con.4: Use const to define objects with values that do not change after construction
+(構築後に変化しないオブジェクトはconstで定義する)
+
+オブジェクトの値の変化による意図しない挙動を防ぐ。
+
+Con.5: Use constexpr for values that can be computed at compile time
+(コンパイル時にも計算できる値にはconstexprを使う)
+
+F.4.参照
+パフォーマンスの向上、コンパイル時のチェック、データの競合を回避できる。
+
+
+T.gp: Generic programming / ジェネリックプログラミング
+T.1: Use templates to raise the level of abstraction of code
+(テンプレートを使ってコードの抽象化度を上げる)
+
+汎用的な処理に対して対象の型を絞って関数を実装するよりも、複数の型を対象とした抽象度の高い実装にしたほうが効率的で再利用しやすい。
+
+T.2: Use templates to express algorithms that apply to many argument types
+(テンプレートを使って多数の引数の型に適用できるアルゴリズムを表現する)
+
+再利用しやすくソースコードの量も減らすことができる。
+必要以上のテンプレートは実装しない。過度な抽象化は避けること。
+
+T.3: Use templates to express containers and ranges
+(テンプレートを使ってコンテナと範囲を表現する)
+
+コンテナには要素の型が必要となるが、それをテンプレート引数で表現することは再利用しやすく安全な実装につながる。
+
+
+T.4: Use templates to express syntax tree manipulation
+(テンプレートを使って構文木の操作を表現する)
+
+？？？記載ない。
+
+T.5: Combine generic and OO techniques to amplify their strengths, not their costs
+(ジェネリックプログラミングとオブジェクト指向プログラミングを組み合わせ、お互いのコストではなく、強みを伸ばす)
+
+？？？中身があまり理解できていない。
+
+T.concepts: Concept rules / コンセプトのルール
+T.con-use: Concept use / コンセプト利用時のルール
+T.10: Specify concepts for all template arguments
+(すべてのテンプレート引数にコンセプトを書く)
+
+コンセプトを書くことにより、読みやすくなり、関数が安全に使用されるようになる。
+コンセプトが使用できる環境では制約のないtypenameやautoは基本的に使用しない。
+
+T.11: Whenever possible use standard concepts
+(可能なら標準のコンセプトを使う)
+
+独自のコンセプトを実装するよりもすでにブラッシュアップされた標準のコンセプトを使用するほうが安全。
+設計者が独自にコンセプトを設計するのはむずかしい。要件の抜け漏れが起こりうる。
+
+T.12: Prefer concept names over auto for local variables
+(ローカル変数の宣言にはautoよりコンセプト名を使う)
+
+autoは便利だがなんの制約も変数の意味も表現できない。
+
+
+T.13: Prefer the shorthand notation for simple, single-type argument concepts
+(1引数の単純なコンセプトには略記法を使う)
+
+読みやすさと、意味の明示のためsortableなどで表現する。
+
+T.concepts.def: Concept definition rules / コンセプト定義時のルール
+T.20: Avoid "concepts" without meaningful semantics
+(有意義な意味論の無いコンセプトを作らない)
+
+コンセプトは、数/要素の範囲/順序などの意味概念を表現する目的。
+必要な演算子などの制約は、別名定義して記述する必要がある。
+複数の演算子を制約として持つほうが、意図しない型の一致を回避できる。
+
+T.21: Require a complete set of operations for a concept
+(コンセプトの制約には必要な操作をすべて含める)
+
+わかりやすさと使いやすさ。メンテナンス性の向上。
+減算演算子のみを制約とするのではなく、加算演算子を併せて定義するなど、有用な処理をできるように定義すべき。
+
+T.22: Specify axioms for concepts
+(コンセプトを定義する公理を(コメントで)書く)
+
+axiomは未サポートのため、前提となる定義はすべてコメントで記載する。
+コンセプト自体が新しい機能のため今後の拡張などが見込まれているが、
+
+
+CPL: C-style programming / Cスタイルプログラミング
+CPL.1: Prefer C++ to C
+(CよりもC++)
+CPL.2: If you must use C, use the common subset of C and C++, and compile the C code as C++
+(Cを使わざるを得ないなら、CとC++の共通部分を使い、CのコードをC++としてコンパイルする)
+CPL.3: If you must use C for interfaces, use C++ in the calling code using such interfaces
+(Cをインターフェースに使わざるを得ないなら、そのようなインターフェースを呼び出すコードはC++で書く)
+SF: Source files / ソースファイル
+SF.1: Use a .cpp suffix for code files and .h for interface files if your project doesn’t already follow another convention
+(プロジェクトがまだ他の慣習に従っていないのであれば、ソースファイルには.cpp、ヘッダーファイルには.hの拡張子を使う)
+SF.2: A .h file may not contain object definitions or non-inline function definitions
+(.hファイルにオブジェクトの定義やインラインでない関数の定義を含めてはいけない)
+SF.3: Use .h files for all declarations used in multiple source files
+(.hファイルに複数のソースファイルで使う宣言を書く)
+SF.4: Include .h files before other declarations in a file
+(.hファイルをファイル内の他の宣言より先にインクルードする)
+SF.5: A .cpp file must include the .h file(s) that defines its interface
+(.cppファイルはそのインターフェースを定義する.hファイルをインクルードしなければならない)
+SF.6: Use using namespace directives for transition, for foundation libraries (such as std), or within a local scope (only)
+(using namespaceは移行のため、stdのような基礎的ライブラリのため、あるいはローカルスコープに限って使う)
+SF.7: Don’t write using namespace at global scope in a header file
+(ヘッダーファイルのグローバルスコープにおいてusing namespaceをしない)
+SF.8: Use #include guards for all .h files
+(すべての.hファイルにインクルードガードを書く)
+SF.9: Avoid cyclic dependencies among source files
+(ソースファイルの依存関係が循環しないようにする)
+SF.10: Avoid dependencies on implicitly #included names
+(暗黙にインクルードされた名前への依存を避ける)
+
