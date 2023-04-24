@@ -907,11 +907,21 @@ SL.con.4: don’t use memset or memcpy for arguments that are not trivially-copy
 SL.str: String / 文字列
 SL.str.1: Use std::string to own character sequences
 (文字列を所有するにはstd::stringを使う)
+
+コピーや文字列の変更などを安全に処理するAPIが提供されている。
+範囲チェックやメモリの割り当て/開放が内部的に実行されるため、使用者は純粋な文字列操作のみを実装できる。
+
 SL.str.2: Use std::string_view or gsl::span<char> to refer to character sequences
 (文字列を参照するにはstd::string_viewやgsl::span<char>を使う)
+
+文字列に対して安全にアクセスできる。
+std::string_viewにすればread-onlyにでき、部分的な文字列も提供できる。
+
 SL.str.3: Use zstring or czstring to refer to a C-style, zero-terminated, sequence of characters
 (C文字列を参照するにはzstringやczstringを使う)
 
+プレーンなchar*は整数へのポインタや文字列/1文字へのポインタなど意味が複数ある。
+zstringやczstringを使うことで文字列であること明示することで、読み手の誤解を避ける。
 
 SL.C: The C Standard Library / C標準ライブラリ
 S.C.1: Don’t use setjmp/longjmp
