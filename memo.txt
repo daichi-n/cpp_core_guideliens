@@ -739,33 +739,208 @@ T.22: Specify axioms for concepts
 axiomは未サポートのため、前提となる定義はすべてコメントで記載する。
 コンセプト自体が新しい機能のため今後の拡張などが見込まれているが、
 
+Template interfaces / テンプレートインターフェース
+T.40: Use function objects to pass operations to algorithms
+(アルゴリズムへ操作を渡すのには関数オブジェクトを使う)
+T.41: Require only essential properties in a template’s concepts
+(テンプレートのコンセプトでは最も重要な性質だけを要求する)
+T.42: Use template aliases to simplify notation and hide implementation details
+(テンプレートのエイリアスを使って記述を簡潔にし、実装の詳細を隠す)
+
+T.def: Template definitions / テンプレート定義
+T.60: Minimize a template’s context dependencies
+(テンプレートはコンテキストにできる限り依存させない)
+T.61: Do not over-parameterize members (SCARY)
+(メンバーをパラメーター化しすぎない)
+T.62: Place non-dependent class template members in a non-templated base class
+(非依存のクラステンプレートメンバーはテンプレートではない基底クラスに置く)
+
+T.temp-hier: Template and hierarchy rules / テンプレートとクラス階層のルール
+T.80: Do not naively templatize a class hierarchy
+(クラス階層全体を単純にテンプレート化しない)
+T.81: Do not mix hierarchies and arrays
+(クラス階層と配列を混ぜて使わない)
+T.82: Linearize a hierarchy when virtual functions are undesirable
+
+T.var: Variadic template rules / 可変引数テンプレートのルール
+T.100: Use variadic templates when you need a function that takes a variable number of arguments of a variety of types
+(異なる型の可変長の引数をとる関数が必要な場合は、可変引数テンプレートを使う)
+T.103: Don’t use variadic templates for homogeneous argument lists
+(同じ型の引数リストを可変引数テンプレートにしない)
+
+
+T.meta: Template metaprogramming (TMP) / テンプレートメタプログラミング
+T.120: Use template metaprogramming only when you really need to
+(テンプレートメタプログラミングは本当に必要なときだけにする)
+T.121: Use template metaprogramming primarily to emulate concepts
+(テンプレートメタプログラミングでコンセプトを模倣する)
+T.122: Use templates (usually template aliases) to compute types at compile time
+(コンパイル時に型を計算するにはテンプレートやテンプレートエイリアスを使う)
+
+Other template rules / その他
+T.140: Name all operations with potential for reuse
+(再利用する可能性があるすべての操作に名前をつける)
+T.141: Use an unnamed lambda if you need a simple function object in one place only
+(一か所でしか使わない単純な関数オブジェクトが必要ならラムダ式を使う)
+T.142: Use template variables to simplify notation
+(変数テンプレートを使って記述を簡素にする)
 
 CPL: C-style programming / Cスタイルプログラミング
 CPL.1: Prefer C++ to C
 (CよりもC++)
+
+C++は高速で安全なコードを提供する。
+
 CPL.2: If you must use C, use the common subset of C and C++, and compile the C code as C++
 (Cを使わざるを得ないなら、CとC++の共通部分を使い、CのコードをC++としてコンパイルする)
+
+C++ としてコンパイルすると型チェックがより適用される。
+
 CPL.3: If you must use C for interfaces, use C++ in the calling code using such interfaces
 (Cをインターフェースに使わざるを得ないなら、そのようなインターフェースを呼び出すコードはC++で書く)
+
+C++ は C よりも表現力が高く、ほかのプログラミングも適切にサポートする。
+C++の機能で安全にカプセル化したものを使用する。
+
 SF: Source files / ソースファイル
 SF.1: Use a .cpp suffix for code files and .h for interface files if your project doesn’t already follow another convention
 (プロジェクトがまだ他の慣習に従っていないのであれば、ソースファイルには.cpp、ヘッダーファイルには.hの拡張子を使う)
+
+記述なし。Callistoのヘッダファイルはhppとしている。
+
 SF.2: A .h file may not contain object definitions or non-inline function definitions
 (.hファイルにオブジェクトの定義やインラインでない関数の定義を含めてはいけない)
+
+重複定義ができないコードをかくとリンクでエラーとなる。
+必要な場合はインクルードガードやテンプレートで対策する。
+
 SF.3: Use .h files for all declarations used in multiple source files
 (.hファイルに複数のソースファイルで使う宣言を書く)
+
+保守性。 読みやすさ。cppからexternすると宣言もとをおいづらくなる。
+リンクするまでエラーを検知できない。
+
 SF.4: Include .h files before other declarations in a file
 (.hファイルをファイル内の他の宣言より先にインクルードする)
+
+読みやすさの向上をする。
+
 SF.5: A .cpp file must include the .h file(s) that defines its interface
 (.cppファイルはそのインターフェースを定義する.hファイルをインクルードしなければならない)
+
+コンパイラの整合性チェックが働くため、未使用の関数においても型の不整合などを即座に確認できる。
+
 SF.6: Use using namespace directives for transition, for foundation libraries (such as std), or within a local scope (only)
 (using namespaceは移行のため、stdのような基礎的ライブラリのため、あるいはローカルスコープに限って使う)
+
+名前の競合が起きやすくなるため。ただし、すべての名前をいちいち就職するのはコードの読みづらさにつながる。
+移行中？？
+
 SF.7: Don’t write using namespace at global scope in a header file
 (ヘッダーファイルのグローバルスコープにおいてusing namespaceをしない)
+
+意図しない同名関数と紐づけられることを回避する。
+
 SF.8: Use #include guards for all .h files
 (すべての.hファイルにインクルードガードを書く)
+
+ファイルの重複インクルードを避ける。
+ガードには適切なユニークな名前をつける。
+
 SF.9: Avoid cyclic dependencies among source files
 (ソースファイルの依存関係が循環しないようにする)
+
+コンパイル処理の効率が下がる。
+
 SF.10: Avoid dependencies on implicitly #included names
 (暗黙にインクルードされた名前への依存を避ける)
 
+コードに対してミニマムに必要なインクルードを適切に宣言する。
+以下のケースでBだけ使用したいのに、Aをインクルードすることは避ける。
+　＞A(B.C含む)
+ＡからＢがなくなったときに原因がわかりづらくなる。
+
+
+SL: The Standard library / 標準ライブラリ
+SL.1: Use libraries wherever possible
+(可能な限りライブラリを使う)
+
+同じものの再作成や複製をして時間を消耗しない。
+既存のものの利用と改善で作業を効率化する。
+
+SL.2: Prefer the standard library to other libraries
+(他のライブラリより標準ライブラリを使う)
+
+標準ライブラリは安定しており、メンテナンスもされている。
+また、幅広く利用されており、ほかのひともうごきがわかりやすい。
+
+SL.3: Do not add non-standard entities to namespace std
+(std名前空間に非標準の要素を追加しない)
+
+規格に準拠したほかのコードの意味が変わってしまうため。
+将来的に追加される機能との衝突が起こりうる。
+
+SL.4: Use the standard library in a type-safe manner
+(標準ライブラリは型安全性を守って使う)
+
+未定義の動作やメモリ破壊などエラーの発生につながる。
+
+SL.con: Containers / コンテナ
+SL.con.1: Prefer using STL array or vector instead of a C array
+(C配列よりもSTLのarrayやvectorを使う)
+
+コンテナに対してC配列を使用するメリットはない。
+固定長配列の場合は、std::array を使用します。
+関数に渡してもポインターにならないので、サイズを知ることができる。 
+また、スタック割り当て std::array はその要素をスタックに保持する。 
+可変長配列の場合は、std::vector を使用する。サイズを変更し、メモリ割り当てができる。
+
+SL.con.2: Prefer using STL vector by default unless you have a reason to use a different container
+(他のコンテナを使う理由がなければまずはvectorを使う)
+
+SL.con.3: Avoid bounds errors
+(境界エラーを避ける)
+
+SL.con.4: don’t use memset or memcpy for arguments that are not trivially-copyable
+(トリビアルコピー可能ではない型の引数に memset や memcpy を使わない)
+
+SL.str: String / 文字列
+SL.str.1: Use std::string to own character sequences
+(文字列を所有するにはstd::stringを使う)
+SL.str.2: Use std::string_view or gsl::span<char> to refer to character sequences
+(文字列を参照するにはstd::string_viewやgsl::span<char>を使う)
+SL.str.3: Use zstring or czstring to refer to a C-style, zero-terminated, sequence of characters
+(C文字列を参照するにはzstringやczstringを使う)
+
+
+SL.C: The C Standard Library / C標準ライブラリ
+S.C.1: Don’t use setjmp/longjmp
+(setjmp/longjmpを使わない)
+
+A: Architectural Ideas / アーキテクチャー
+A.1: Separate stable code from less stable code
+(安定したコードと不安定なコードを分ける)
+A.2: Express potentially reusable parts as a library
+(再利用できそうなものはライブラリにする)
+A.4: There should be no cycles among libraries
+(ライブラリ間の依存関係が循環してはならない)
+
+NL: Naming and layout / 名前付けとレイアウト
+NL.1: Don’t say in comments what can be clearly stated in code
+(コードで明確に表現できることをコメントで書かない)
+NL.2: State intent in comments
+(意図をコメントに書く)
+NL.3: Keep comments crisp
+(コメントは短く明快にする)
+NL.4: Maintain a consistent indentation style
+(一貫したインデントスタイルを守る)
+NL.5: Avoid encoding type information in names
+(型の情報を名前に埋め込まない)
+NL.7: Make the length of a name roughly proportional to the length of its scope
+(名前の長さがスコープの長さにおおよそ比例するようにする)
+NL.8: Use a consistent naming style
+(一貫した名前のスタイルを使う)
+NL.9: Use ALL_CAPS for macro names only
+(すべて大文字の名前はマクロの名前だけに使う)
+NL.10: Prefer underscore_style names
+(名前のスタイルをunderscore_styleにする)
