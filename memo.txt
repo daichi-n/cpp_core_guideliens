@@ -742,18 +742,40 @@ axiomは未サポートのため、前提となる定義はすべてコメント
 Template interfaces / テンプレートインターフェース
 T.40: Use function objects to pass operations to algorithms
 (アルゴリズムへ操作を渡すのには関数オブジェクトを使う)
+
+関数ポインタはインターフェース定義に乗る情報が少ない。
+性能面でも関数へのポインタは処理が遅くなる可能性がある。？
+
 T.41: Require only essential properties in a template’s concepts
 (テンプレートのコンセプトでは最も重要な性質だけを要求する)
+
+インターフェイスはシンプルで安定したものにする。
+使用するすべての操作を要件として列挙することを求めると、インタフェースが不安定になる。
+
 T.42: Use template aliases to simplify notation and hide implementation details
 (テンプレートのエイリアスを使って記述を簡潔にし、実装の詳細を隠す)
+
+読みやすさを向上させて、内部の実装を隠蔽できる。
+テンプレートの使用者がテンプレートの中身を気にすることなく使用できる。
 
 T.def: Template definitions / テンプレート定義
 T.60: Minimize a template’s context dependencies
 (テンプレートはコンテキストにできる限り依存させない)
+
+理解を容易にします。
+テンプレートはヘッダに記述されるため、予期せぬ依存関係が起きる可能性があり、それによるエラーを回避する必要がある。
+
 T.61: Do not over-parameterize members (SCARY)
 (メンバーをパラメーター化しすぎない)
+
+テンプレート引数に依存しないメンバは、特定のテンプレート引数以外では使用できない。
+これは、コードサイズを増加させる。
+依存関係が明確になるようにテンプレートを独立させる。
+
 T.62: Place non-dependent class template members in a non-templated base class
 (非依存のクラステンプレートメンバーはテンプレートではない基底クラスに置く)
+
+依存のないテンプレートメンバは基底クラスに置くことで、テンプレートのインスタンス化をしないようにする。
 
 T.temp-hier: Template and hierarchy rules / テンプレートとクラス階層のルール
 T.80: Do not naively templatize a class hierarchy
@@ -930,27 +952,79 @@ S.C.1: Don’t use setjmp/longjmp
 A: Architectural Ideas / アーキテクチャー
 A.1: Separate stable code from less stable code
 (安定したコードと不安定なコードを分ける)
+
+以下を行えるように安定性の低いコードを分離する。
+　・単体テスト
+　・インターフェースの改善
+　・リファクタリング
+　・最終的な非推奨化
+
 A.2: Express potentially reusable parts as a library
 (再利用できそうなものはライブラリにする)
+
+ライブラリにする場合は、
+　・メンテナンスしていく
+　・文書化する
+　・ヘッダとオブジェクトファイルのセットにする
+
 A.4: There should be no cycles among libraries
 (ライブラリ間の依存関係が循環してはならない)
+
+・ビルドを複雑化する。
+・不確定な動作につながる可能性がある。
 
 NL: Naming and layout / 名前付けとレイアウト
 NL.1: Don’t say in comments what can be clearly stated in code
 (コードで明確に表現できることをコメントで書かない)
+
+コンパイラはコメントを読んでチェックすることができない。
+また、コメントは継続してメンテナンスされない可能性がある。
+
 NL.2: State intent in comments
 (意図をコメントに書く)
+
+何をするかはコードが表現しているので、なぜそうしているのかの意図をコメントで簡潔にかく。
+
 NL.3: Keep comments crisp
 (コメントは短く明快にする)
+
+冗長なコメントは読みづらくソースファイルを汚すことになる。
+わかりやすい英語を使うこと。文法、句読点、大文字、小文字に気を付ける。
+
 NL.4: Maintain a consistent indentation style
 (一貫したインデントスタイルを守る)
+
+インデント漏れによるバグを避ける。
+if (...), for (...), while (...) の後の文は、常にインデントする。
+
 NL.5: Avoid encoding type information in names
 (型の情報を名前に埋め込まない)
+
+名前に型を埋め込むと、その機能を提供するために使用する型を変更することが難しくなる。
+また、変数の型を変更すると、その変数を使用するコードも変更しなければならなる。意味のない修正を最小限にする。
+
+
 NL.7: Make the length of a name roughly proportional to the length of its scope
 (名前の長さがスコープの長さにおおよそ比例するようにする)
+
+意図しない名称の衝突が起こることを避ける。
+
 NL.8: Use a consistent naming style
 (一貫した名前のスタイルを使う)
+
+ネーミングや命名の仕方に一貫性を持たせることで、可読性を高める。
+ただし、ライブラリはオリジナルのスタイルを保っておくこと。
+ISO規格では、小文字のみを使用し、数字はアンダースコアで単語を区切って使用する。
+ダブルアンダースコアは避ける。
+
 NL.9: Use ALL_CAPS for macro names only
 (すべて大文字の名前はマクロの名前だけに使う)
+
+スコープや型の規則に従った名前を持つマクロを混同しないようにするため。
+
 NL.10: Prefer underscore_style names
 (名前のスタイルをunderscore_styleにする)
+
+名前の一部を区切るためにアンダースコアを使用するのは、CおよびC++のオリジナルのスタイルであり、C++標準ライブラリでも使用されている。
+一貫性は、個人の好みに勝る。制約がない場合や、より良いアイデアがある場合に推奨されるもの。
+ガイダンスを求めるリクエストに応えて追加されたルールであり、基本的にはプロジェクトのルールを優先する。
