@@ -780,32 +780,76 @@ T.62: Place non-dependent class template members in a non-templated base class
 T.temp-hier: Template and hierarchy rules / テンプレートとクラス階層のルール
 T.80: Do not naively templatize a class hierarchy
 (クラス階層全体を単純にテンプレート化しない)
+
+実行されない関数がどれなのかをコンパイラが判断できず、すべての関数を実行コードとして生成してしまうため。
+
 T.81: Do not mix hierarchies and arrays
 (クラス階層と配列を混ぜて使わない)
+
+派生クラスの配列のポインターを取得すると、暗黙的に基底クラスへの参照となってしまう。
+不正なメモリアクセスを招く可能性がある。
+
 T.82: Linearize a hierarchy when virtual functions are undesirable
+(仮想関数が好ましくないなら、クラス階層を直線的にする)
+
+※記載なし。※
 
 T.var: Variadic template rules / 可変引数テンプレートのルール
 T.100: Use variadic templates when you need a function that takes a variable number of arguments of a variety of types
 (異なる型の可変長の引数をとる関数が必要な場合は、可変引数テンプレートを使う)
+
+※詳細があまり書かれていない※
+可変個引数テンプレートは効率的で型安全のため、C 言語の可変引数を使用しない？
+
+
+T.101: ??? How to pass arguments to a variadic template ???
+(可変個引数テンプレートに引数を渡す方法)
+
+※詳細があまり書かれていない※
+
+T.102:How to process arguments to a variadic template
+(可変個引数テンプレートへの引数を処理する方法)
+
+※詳細があまり書かれていない※
+
 T.103: Don’t use variadic templates for homogeneous argument lists
 (同じ型の引数リストを可変引数テンプレートにしない)
 
+※詳細があまり書かれていない※
+initializer_list などでのほうが記載がシンプルになる。？
 
 T.meta: Template metaprogramming (TMP) / テンプレートメタプログラミング
 T.120: Use template metaprogramming only when you really need to
 (テンプレートメタプログラミングは本当に必要なときだけにする)
+
+テンプレートのメタプログラミングを正しく実装するのは難しく、コンパイル時間の増加や保守性の低下につながる。
+
 T.121: Use template metaprogramming primarily to emulate concepts
 (テンプレートメタプログラミングでコンセプトを模倣する)
+
+C++20 が利用できない場合は、コンセプトの代わりにテンプレートメタプログラミングを使用してエミュレートする必要がある。
+
 T.122: Use templates (usually template aliases) to compute types at compile time
 (コンパイル時に型を計算するにはテンプレートやテンプレートエイリアスを使う)
 
+推奨ではないが、テンプレート メタプログラミングは、コンパイル時に型を生成する方法です。
+
 Other template rules / その他
-T.140: Name all operations with potential for reuse
+T.140: If an operation can be reused, give it a name](#Rt-name
 (再利用する可能性があるすべての操作に名前をつける)
+
+※F.10参照
+
 T.141: Use an unnamed lambda if you need a simple function object in one place only
 (一か所でしか使わない単純な関数オブジェクトが必要ならラムダ式を使う)
+
+※F.11参照
+
 T.142: Use template variables to simplify notation
 (変数テンプレートを使って記述を簡素にする)
+
+可読性の向上。
+※詳細があまり書かれていない※
 
 CPL: C-style programming / Cスタイルプログラミング
 CPL.1: Prefer C++ to C
