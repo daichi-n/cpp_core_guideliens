@@ -1,27 +1,43 @@
-C.120: Use class hierarchies to represent concepts with inherent hierarchical structure (only)
-(クラス階層は元々階層的な構造を備えているものを表現するためだけに用いる)
+C.120: Use class hierarchies to represent concepts with inherent hierarchical structure (only)(クラス階層は元々階層的な構造を備えているものを表現するためだけに用いる)
+→無理に抽象化すると、派生クラスのほとんどがインタフェースを適切に実装できなくなる。
+　基底クラスがあること自体が実装上の負担になってしまう。
 
-C.121: If a base class is used as an interface, make it a pure abstract class
-(インターフェースとして使う基底クラスは純粋抽象クラスにする)
-C.122: Use abstract classes as interfaces when complete separation of interface and implementation is needed
-(インターフェースと実装の分離が必要なら抽象クラスをインターフェースとして使う)
+C.121: If a base class is used as an interface, make it a pure abstract class(インターフェースとして使う基底クラスは純粋抽象クラスにする)
+→基底クラスがデストラクタを仮想宣言していないと、派生クラスのメンバのリソース開放が漏れてしまう。
 
-C.160: Define operators primarily to mimic conventional usage
-(演算子は慣例的な用法に倣って定義する)
-C.161: Use nonmember functions for symmetric operators
-(対称な演算子は非メンバー関数として定義する)
-C.162: Overload operations that are roughly equivalent
-(おおよそ等価な操作はオーバーロードする)
-C.164: Avoid implicit conversion operators
-(暗黙の変換演算子を避ける)
-C.165: Use using for customization points
-(カスタマイゼーションポイントにはusingを使う)
+C.122: Use abstract classes as interfaces when complete separation of interface and implementation is needed(インターフェースと実装の分離が必要なら抽象クラスをインターフェースとして使う)
+→インタフェース内の実装が変わった場合も、呼びもとに対して影響ができないようにするために、抽象クラスをインタフェースとして使う。
+
+C.160: Define operators primarily to mimic conventional usage(演算子は慣例的な用法に倣って定義する)
+→直感的に読めないコードは可読性の低下とバグの混入につながる。
+
+C.161: Use nonmember functions for symmetric operators(対称な演算子は非メンバー関数として定義する)
+→a==bはaのメンバ関数、b==aはbのメンバ関数に実装することになり、また、内部の実装によって見た目と意味が一致しないケースがある。
+　非メンバー関数としないとaとbの比較ではなく、aに対してのb、bに対してのaの比較になってしまう。
+
+C.162: Overload operations that are roughly equivalent(おおよそ等価な操作はオーバーロードする)
+→呼びもとが型を意識して関数名をたたき分ける手間がなくせる。
+
+C.163: Overload only for operations that are roughly equivalent(おおよそ等価な操作だけをオーバーロードする)
+→同じ名前の関数には同じ振る舞いが求められる。releace()なのにリソースを開放せずに初期化するだけだとリークにつながるなど。
+
+C.164: Avoid implicit conversion operators(暗黙の変換演算子を避ける)
+→特別な意図がない限りは変換は明示的に行うこと。見つけにくいバグの混入につながるため。
+
+C.165: Use using for customization points(カスタマイゼーションポイントにはusingを使う)
+→標準ライブラリの関数を呼ぶか所でカスタマイズした関数を呼びたい場合にusingを使用する。
+　目的は同じならば特別な名前をつけるほうが読みにくくなるため。
 
 C.180: Use unions to save memory(共用体を使ってメモリーを節約する)
 →同時に使用されることのないオブジェクトが複数ある場合に、メモリを節約するために使用することができる。
+
 C.181: Avoid "naked" unions(裸の共用体を避ける)
 →ネイキッド・ユニオン（naked union）とは、どのメンバにいつでもアクセスできる状態のunionであり、
 値を設定しないめんばに対してのアクセスができることでエラーの原因となる。
 c++17以降はvariantを使用すること。
+
 C.182: Use anonymous unions to implement tagged unions(無名共用体を使ってタグ付けされた共用体を実装する)
+→これ自体は特殊な実装ケースのため、製品開発においてはVariantを使用する。
+
 C.183: Don’t use a union for type punning(共用体を型変換のために使わない)
+→未定義動作となり振る舞いが保障されない。
